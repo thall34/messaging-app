@@ -8,13 +8,7 @@ const validateUser = [
     body('password')
     .trim()
     .notEmpty().withMessage('Must include a password')
-    .isLength({ min: 8, max: 20 }).withMessage('Password must be at least 8 characters but less than 20')
-    .isStrongPassword({
-        minLowerCase: 1,
-        minUpperCase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-    }).withMessage('Password must contain at least 1 lower case letter, 1 upper case letter, 1 number, and 1 symbol'),
+    .isLength({ max: 20 }).withMessage('Password must be less than 20 characters'),
     body('email')
     .trim()
     .notEmpty().withMessage('Must include an email')

@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("passport");
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const prisma = require('./config/db');
+const cors = require('cors')
 
 const userRouter = require('./routes/userRouter');
 const messageRouter = require('./routes/messageRouter');
@@ -12,6 +13,8 @@ const errorHandler = require('./middleware/errorHandler');
 const PORT = process.env.PORT || 3000
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 require("dotenv/config");
@@ -37,7 +40,7 @@ app.use(passport.session());
 
 app.use('/api/users', userRouter);
 app.use('/api/messages', messageRouter);
-app.use('*', (req, res, next) => {
+app.use('/{*splat}', (req, res, next) => {
   const error = new Error('Invalid URL');
   error.status = 404;
   next(error);

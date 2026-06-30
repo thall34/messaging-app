@@ -4,7 +4,7 @@ const validateLogin = [
     body('username')
     .trim()
     .notEmpty().withMessage('Must include a username'),
-    body('lastName')
+    body('password')
     .trim()
     .notEmpty().withMessage('Must include a password'),
 ];

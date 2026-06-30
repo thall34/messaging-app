@@ -5,14 +5,14 @@ const { validationResult, matchedData } = require('express-validator');
 
 // logs in user to passport local session
 function logInUser(req, res, next) {
-    passport.authenticate('local', (err, user) => {
+    passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
         };
 
         if (!user) {
             return res.status(401).json({
-                message: 'Invalid username or password',
+                message: info?.message || 'Invalid username or password',
             });
         };
 
@@ -26,7 +26,7 @@ function logInUser(req, res, next) {
                 user: user,
             });
         });
-    });
+    }) (req, res, next);
 };
 
 // logs out user from passport local session
@@ -76,6 +76,9 @@ async function findUser(req, res, next) {
 
 // creates new user in database
 async function createUser(req, res, next) {
+    console.log(req.body);
+    console.log(matchedData(req));
+    console.log(validationResult(req).array());
     const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -88,7 +91,7 @@ async function createUser(req, res, next) {
         const { username, password, email, birthDate } = matchedData(req);
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await db.createNewUser(username, hashedPassword, email, birthDate);
-        if (!user) {
+        if (!newUser) {
             return res.status(400).json({
                 message: 'Failed creating new user',
             });  
