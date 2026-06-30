@@ -6,9 +6,52 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  password String
+  email String @unique
+  birthDate DateTime @db.Date
+  createdAt DateTime @default(now())
+  sentMessages Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  ownedContacts Contact[] @relation("OwnedContacts")
+  addedByContacts Contact[] @relation("AddedByContacts")
+}
+
+model Contact {
+  id Int @id @default(autoincrement())
+
+  ownerId Int
+  contactId Int
+
+  owner User @relation("OwnedContacts", fields: [ownerId], references: [id], onDelete: Cascade)
+  contact User @relation("AddedByContacts", fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, contactId])
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  text String
+  authorId Int
+  recipientId Int
+  createdAt DateTime @default(now())
+
+  author User @relation("SentMessages", fields: [authorId], references: [id], onDelete: Cascade)
+  recipient User @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id  String  @id
+  sid String  @unique
+  data  String
+  expiresAt  DateTime
 }
